@@ -24,7 +24,7 @@ sup_spec() ->
 	}.
 
 start_link() ->
-	gen_server:start_link({local, ?MODULE}, [], []).
+	gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 -spec broadcast(string()) -> ok.
 broadcast(Message) ->

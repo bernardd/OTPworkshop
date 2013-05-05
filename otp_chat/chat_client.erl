@@ -8,7 +8,8 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, code_change/3, terminate/2]).
 
 -record(state, {
-		socket = undefined
+		socket = undefined,
+		read = []
 	}).
 
 %% Public functions
@@ -17,7 +18,7 @@ sup_spec() ->
 	{
 		client,                       % ID
 		{?MODULE, start_link, []},    % Start spec MFA
-		permanent,                    % Restart type
+		temporary,                    % Restart type
 		1000,                         % Shutdown timeout
 		worker,                       % Child type
 		[?MODULE]                     % Child modules
@@ -42,10 +43,12 @@ handle_cast({send, Message}, State = #state{socket = Socket}) ->
 
 handle_cast(_Msg, State) -> {noreply, State}.
 
-handle_info({tcp_error, Socket}, State = #state{socket = Socket}) ->
+handle_info({tcp_error, Socket, Reason}, State = #state{socket = Socket}) ->
+	io:fwrite("~p Socket error: ~p\n", [self(), Reason]),
 	{stop, normal, State};
 
 handle_info({tcp_closed, Socket}, State = #state{socket = Socket}) ->
+	io:fwrite("~p Socket closed\n", [self()]),
 	{stop, normal, State};
 
 handle_info({tcp, Socket, Data}, State = #state{socket = Socket}) ->
@@ -54,6 +57,7 @@ handle_info({tcp, Socket, Data}, State = #state{socket = Socket}) ->
 	{noreply, State};
 
 handle_info({transfer_socket, Socket}, State = #state{socket = undefined}) ->
+	io:fwrite("~p New connection established\n", [self()]),
 	inet:setopts(Socket, [{active, once}]),
 	{noreply, State#state{socket = Socket}};
 
