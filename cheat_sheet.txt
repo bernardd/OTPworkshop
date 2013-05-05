@@ -1,4 +1,4 @@
-dialyzer --build_plt --apps stdlib kernel
+dialyzer --build_plt --apps stdlib kernel erts
 
 make:all().
 
