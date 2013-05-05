@@ -4,7 +4,10 @@
 
 -export([start/2, start_phase/3, stop/1, config_change/3]).
 
+-define(DEFAULT_CHAT_PORT, 2000).
+
 start(_StartType, _StartArgs) ->
+	supervisor:start_link(?MODULE, main_sup).
 	
 start_phase(Phrase, StartType, PhaseArgs) -> ok.
 
@@ -31,11 +34,11 @@ init(main_sup) ->
 			% Main chat server:
 			chat:sup_spec(),
 			% Socket listener:
-			async_tcp_listener:sup_spec(client_listener, [?DEFAULT_CHAT_PORT, supervisor, start_child, [client_sup, []]]),
+			async_tcp_listener:sup_spec(client_listener, [?DEFAULT_CHAT_PORT, supervisor, start_child, [client_sup, []]])
 			% Status server:
-			status_listener:sup_spec()
+%			status_listener:sup_spec()
 		]
-	}.
+	};
 
 init(client_sup) ->
 	{ok, {
@@ -43,4 +46,10 @@ init(client_sup) ->
 			0,           % Max retries - unused
 			0            % Max time - unused
 		},
+		[
+			chat_client:sup_spec()
+		]
+	}.
+				
+
 
