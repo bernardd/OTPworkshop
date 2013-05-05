@@ -1,0 +1,8 @@
+dialyzer --build_plt --apps stdlib kernel
+
+make:all().
+
+c(Module). % Compile, purge and reload
+
+application:load(chat).
+
