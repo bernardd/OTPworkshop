@@ -9,7 +9,7 @@
 
 -record(state, {
 		socket = undefined,
-		read = []
+		data_so_far = []
 	}).
 
 %% Public functions
@@ -52,9 +52,9 @@ handle_info({tcp_closed, Socket}, State = #state{socket = Socket}) ->
 	{stop, normal, State};
 
 handle_info({tcp, Socket, Data}, State = #state{socket = Socket}) ->
-	chat:broadcast(Data),
+	NewState = handle_data(Data, State),
 	inet:setopts(Socket, [{active, once}]),
-	{noreply, State};
+	{noreply, NewState};
 
 handle_info({transfer_socket, Socket}, State = #state{socket = undefined}) ->
 	io:fwrite("~p New connection established\n", [self()]),
@@ -66,3 +66,20 @@ handle_info(_Msg, State) -> {noreply, State}.
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 
 terminate(_Reason, _State) -> ok.
+
+handle_data(Data, State = #state{data_so_far = SoFar}) ->
+	All = SoFar ++ Data,
+	Remaining = handle_lines(All),
+	State#state{data_so_far = Remaining}.
+
+handle_lines(Str) ->
+	case string:chr(Str, $\n) of
+		0 -> Str; % No EOL found
+		N ->
+			{Line, Rest} = lists:split(N, Str),
+			handle_line(Line),
+			handle_lines(Rest)
+	end.
+
+handle_line(Line) ->
+	chat:broadcast(Line).
