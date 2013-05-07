@@ -25,6 +25,7 @@ loop(Socket, DataSoFar) ->
 			inet:setopts(Socket, [{active, once}]),
 			loop(Socket, Remaining);
 		_ ->
+			% Eat other messages that might arrive
 			loop(Socket, DataSoFar)
 	end.
 

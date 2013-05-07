@@ -33,3 +33,4 @@ src/Makefile.in
 # Temp vim files
 *~
 *.swp
+*#
