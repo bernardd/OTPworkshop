@@ -35,12 +35,19 @@ init(main_sup) ->
 					supervisor,                                      % Child type
 					[?MODULE]                                        % Child modules
 				},
+				% Chat event manager
+				{
+					chat_evt_mgr,                                    % ID
+					{gen_event, start_link, [{local, chat_evt_mgr}]},% Start spec MFA
+					permanent,                                       % Restart type
+					1000,                                            % Shutdown timeout
+					worker,                                          % Child type
+					[]                                               % Child modules
+				},
 				% Main chat server:
 				chat:sup_spec(),
 				% Socket listener:
 				async_tcp_listener:sup_spec(client_listener, [?DEFAULT_CHAT_PORT, supervisor, start_child, [client_sup, []]])
-				% Status server:
-				%			status_listener:sup_spec()
 			]
 		}};
 

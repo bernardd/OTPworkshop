@@ -34,3 +34,7 @@ src/Makefile.in
 *~
 *.swp
 *#
+
+# Crash dumps
+core
+erl_crash.dump

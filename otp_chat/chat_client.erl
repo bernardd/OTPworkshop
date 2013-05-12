@@ -9,6 +9,7 @@
 
 -record(state, {
 		socket = undefined,
+		name = undefined,
 		data_so_far = []
 	}).
 
@@ -27,6 +28,7 @@ sup_spec() ->
 start_link() ->
 	gen_server:start_link(?MODULE, [], []).
 
+-spec send(pid(), string()) -> ok.
 send(Pid, Message) ->
 	gen_server:cast(Pid, {send, Message}).
 
@@ -58,6 +60,7 @@ handle_info({tcp, Socket, Data}, State = #state{socket = Socket}) ->
 
 handle_info({transfer_socket, Socket}, State = #state{socket = undefined}) ->
 	io:fwrite("~p New connection established\n", [self()]),
+	gen_tcp:send(Socket, "Enter your name: "),
 	inet:setopts(Socket, [{active, once}]),
 	{noreply, State#state{socket = Socket}};
 
@@ -69,17 +72,20 @@ terminate(_Reason, _State) -> ok.
 
 handle_data(Data, State = #state{data_so_far = SoFar}) ->
 	All = SoFar ++ Data,
-	Remaining = handle_lines(All),
-	State#state{data_so_far = Remaining}.
+	handle_lines(All, State).
 
-handle_lines(Str) ->
+handle_lines(Str, State) ->
 	case string:chr(Str, $\n) of
-		0 -> Str; % No EOL found
+		0 -> State#state{data_so_far = Str}; % No EOL found
 		N ->
 			{Line, Rest} = lists:split(N, Str),
-			handle_line(Line),
-			handle_lines(Rest)
+			Cleaned = lists:flatten(string:tokens(Line, "\r")),
+			NewState = handle_line(Cleaned, State),
+			handle_lines(Rest, NewState)
 	end.
 
-handle_line(Line) ->
-	chat:broadcast(Line).
+handle_line(Line, State = #state{name = undefined}) ->
+	State#state{name = string:substr(Line, 1, length(Line)-1)};
+handle_line(Line, State = #state{name = Name}) ->
+	chat:broadcast("<" ++ Name ++ "> " ++ Line),
+	State.

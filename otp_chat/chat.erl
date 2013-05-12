@@ -32,13 +32,16 @@ broadcast(Message) ->
 
 %% gen_server callbacks
 
-init(_) -> {ok, #state{}}.
+init(_) ->
+	gen_event:add_handler(chat_evt_mgr, logger, "chat.log"),
+	{ok, #state{}}.
 
 handle_call(_Msg, _From, State) -> {reply, {error, badcall}, State}.
 
 handle_cast({broadcast, Message, From}, State = #state{messages_sent = Sent}) ->
 	Children = supervisor:which_children(client_sup),
 	[chat_client:send(P, Message) || {_, P, _, _} <- Children, is_pid(P), P =/= From],
+	gen_event:notify(chat_evt_mgr, {chat_msg, Message}),
 	{noreply, State#state{messages_sent = Sent+1}};
 
 handle_cast(_Msg, State) -> {noreply, State}.

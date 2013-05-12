@@ -1,4 +1,4 @@
--module(chat).
+-module(blank_gen_server).
 -behaviour(gen_server).
 
 % Public exports
@@ -9,12 +9,12 @@
 
 -record(state, {}).
 
-%% Public functions
+% Public functions
 
 start_link() ->
 	gen_server:start_link({local, ?MODULE}, [], []).
 
-%% gen_server callbacks
+% gen_server callbacks
 
 init(_) -> {ok, #state{}}.
 
