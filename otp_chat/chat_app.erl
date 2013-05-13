@@ -44,6 +44,8 @@ init(main_sup) ->
 					worker,                                          % Child type
 					[]                                               % Child modules
 				},
+				% Logger event handler guard
+				handler_guard:sup_spec(logger, logger, ["chat.log"]),
 				% Main chat server:
 				chat:sup_spec(),
 				% Socket listener:

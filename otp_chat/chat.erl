@@ -33,7 +33,6 @@ broadcast(Message) ->
 %% gen_server callbacks
 
 init(_) ->
-	gen_event:add_handler(chat_evt_mgr, logger, "chat.log"),
 	{ok, #state{}}.
 
 handle_call(_Msg, _From, State) -> {reply, {error, badcall}, State}.

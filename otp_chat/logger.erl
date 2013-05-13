@@ -1,12 +1,18 @@
 -module(logger).
 -behaviour(gen_event).
 
+% public exports
+-export([start/1]).
+
 % gen_event exports
 -export([init/1, handle_event/2, handle_call/2, handle_info/2, code_change/3, terminate/2]).
 
 -record(state, {
 		file :: file:io_device()
 	}).
+
+start(Filename) ->
+	gen_event:add_handler(chat_evt_mgr, logger, Filename).
 
 % gen_event callbacks
 
