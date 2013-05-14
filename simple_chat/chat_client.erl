@@ -6,7 +6,7 @@ start() ->
 	Socket = receive
 		{socket, S} -> S
 	end,
-	chat ! {new_client, self()},
+	chat_hub ! {new_client, self()},
 	io:fwrite("~p New client started\n", [self()]),
 	inet:setopts(Socket, [{active, once}]),
 	loop(Socket, []).
@@ -39,4 +39,4 @@ handle_data(Str) ->
 	end.
 
 handle_line(Line) ->
-	chat ! {broadcast, self(), Line}.
+	chat_hub ! {broadcast, self(), Line}.

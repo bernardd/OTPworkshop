@@ -4,8 +4,6 @@
 % http://www.trapexit.org/Building_a_Non-blocking_TCP_server_using_OTP_principles</a>
 % (where you can also find a complete writeup of it) because it pretty much does exactly what we want in terms of a 
 % non-blocking TCP server.
-% I did have to change the module name, to avoid a conflict with yxa and I've also made it a little more generic than
-% the original version, in terms of being able to spawn handlers using any MFA triplet.
 %
 % The callback function supplied to `start_link' must return `{ok, Pid}' where `Pid' is the pid to
 % which control of the socket shall be transferred. That process must accept a message of the form
