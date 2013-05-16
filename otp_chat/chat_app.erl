@@ -47,7 +47,7 @@ init(main_sup) ->
 				% Logger event handler guard
 				handler_guard:sup_spec(logger, logger, ["chat.log"]),
 				% Main chat server:
-				chat:sup_spec(),
+				chat_hub:sup_spec(),
 				% Socket listener:
 				async_tcp_listener:sup_spec(client_listener, [?DEFAULT_CHAT_PORT, supervisor, start_child, [client_sup, []]])
 			]

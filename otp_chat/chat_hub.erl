@@ -1,4 +1,4 @@
--module(chat).
+-module(chat_hub).
 -behaviour(gen_server).
 
 % Public exports

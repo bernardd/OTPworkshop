@@ -87,5 +87,5 @@ handle_lines(Str, State) ->
 handle_line(Line, State = #state{name = undefined}) ->
 	State#state{name = string:substr(Line, 1, length(Line)-1)};
 handle_line(Line, State = #state{name = Name}) ->
-	chat:broadcast("<" ++ Name ++ "> " ++ Line),
+	chat_hub:broadcast("<" ++ Name ++ "> " ++ Line),
 	State.
