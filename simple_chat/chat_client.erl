@@ -24,6 +24,9 @@ loop(Socket, DataSoFar) ->
 			Remaining = handle_data(DataSoFar ++ Data),
 			inet:setopts(Socket, [{active, once}]),
 			loop(Socket, Remaining);
+		shutdown ->
+			ok;
+			% No loop - we're done.
 		_ ->
 			% Eat other messages that might arrive
 			loop(Socket, DataSoFar)
@@ -38,5 +41,7 @@ handle_data(Str) ->
 			handle_data(Rest)
 	end.
 
+%handle_line("crash\r\n") ->
+%	a=b;
 handle_line(Line) ->
 	chat_hub ! {broadcast, self(), Line}.
