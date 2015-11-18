@@ -14,7 +14,7 @@ stop() ->
 
 listen() ->
 	register(chat, self()),
-	{ok, Socket} = gen_tcp:listen(2000, [list, {active, false}, {reuseaddr, true}]),
+	{ok, Socket} = gen_tcp:listen(?DEFAULT_CHAT_PORT, [list, {active, false}, {reuseaddr, true}]),
 	await_connection(Socket).
 
 await_connection(Socket) ->
